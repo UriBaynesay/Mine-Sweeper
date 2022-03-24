@@ -33,8 +33,22 @@ body{
 .table{
     margin-left: auto;
     margin-right: auto;
+    cursor: crosshair;
 }
 
 .shown.mine{
   background-color: #ff000099;
+}
+
+/* .manual button{
+  border: 0mm;
+} */
+
+.credit{
+  position: fixed;
+  bottom: 0px;
+}
+
+.selected-cell{
+  outline: auto;
 }

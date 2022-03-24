@@ -12,7 +12,9 @@ const GAME_STATUS = [
   { status: `lost`, icon: `🤯` },
 ];
 
-const HINT_ICON=`💡`;
+const SAFE_CLICK = `🦺`;
+
+const HINT_ICON = `💡`;
 //model
 
 var gBoard;
@@ -22,8 +24,10 @@ var gStartTime;
 var isFirstClick;
 var currGameLevelIdx;
 var numLives;
+var numSafeClicks;
 var numHints;
 var isHintClicked;
+// var isManualGame;
 
 function init(sizeIdx = 0) {
   //setting the model
@@ -36,14 +40,19 @@ function init(sizeIdx = 0) {
   ("gBoard :");
   console.table(gBoard);
   numLives = 3;
+  numSafeClicks = 3;
   numHints = 3;
   isHintClicked = false;
+  // isManualGame=manual;
 
   //setting the DOM
-  renderBoard(gBoard, ".table-body");
+  // var elManualBtn = document.querySelector(`.manual button`);
+  // elManualBtn.style = `initial`;
   renderLives();
-  renderSmiley();
+  renderSafeClicks();
   renderHint();
+  renderBoard(gBoard, ".table-body");
+  renderSmiley();
   var elTimer = document.querySelector(`.timer`);
   elTimer.style.display = `none`;
   clearInterval(gTimerInter);
@@ -56,7 +65,7 @@ function createGame() {
 
 function createBoard(sizeIdx) {
   var board = createMat(GAME_LEVELS[sizeIdx].size, GAME_LEVELS[sizeIdx].size);
-  // setMines(board, sizeIdx);
+  // setRandomMines(board, sizeIdx);
   // setCellNegsCount(board);
 
   return board;
@@ -72,7 +81,7 @@ function createCell() {
   };
 }
 
-function setMines(board, sizeIdx) {
+function setRandomMines(board, sizeIdx) {
   var randomCount = 0;
   while (randomCount < GAME_LEVELS[sizeIdx].mines) {
     var randCell = getRandomCell(board);
@@ -113,7 +122,10 @@ function cellClicked(elCell) {
   // debugger
   if (!gGame.isOn) return;
 
+  // if(isManualGame)
+
   if (!gTimerInter) {
+    gGame.isOn = true;
     gStartTime = Date.now();
     gTimerInter = setInterval(function () {
       renderTimer(".timer");
@@ -122,7 +134,6 @@ function cellClicked(elCell) {
 
   if (isHintClicked) {
     checkHint(elCell);
-
     return;
   }
 
@@ -139,11 +150,13 @@ function cellClicked(elCell) {
   if (isFirstClick) {
     cell.isShown = true;
     isFirstClick = false;
-    setMines(gBoard, currGameLevelIdx);
+    setRandomMines(gBoard, currGameLevelIdx);
     setCellNegsCount(gBoard);
 
     // update DOM
     renderMines();
+    // var elManualBtn = document.querySelector(`.manual button`);
+    // elManualBtn.style.display = `none`;
   }
 
   if (cell.isMarked) {
@@ -356,13 +369,13 @@ function smileyClicked() {
 }
 
 function renderHint() {
-  var elHint=document.querySelector(`.hint`);
-  var strHTML='<p>';
-  for(var i=0;i<numHints;i++){
-    strHTML+=`<span class="hint${i}">${HINT_ICON}</span>`;
+  var elHint = document.querySelector(`.hint`);
+  var strHTML = "<p>";
+  for (var i = 0; i < numHints; i++) {
+    strHTML += `<span class="hint${i}">${HINT_ICON}</span>`;
   }
-  strHTML+=`</p>`
-  elHint.innerHTML=strHTML;
+  strHTML += `</p>`;
+  elHint.innerHTML = strHTML;
 }
 
 function hintClicked() {
@@ -372,13 +385,11 @@ function hintClicked() {
   if (isFirstClick) return;
   isHintClicked = true;
   // debugger
-  var elHint=document.querySelector(`.hint${numHints-1}`);
+  var elHint = document.querySelector(`.hint${numHints - 1}`);
   elHint.classList.add(`selectedHint`);
-  
 }
 
 function checkHint(elCell) {
-
   var cellI = +elCell.dataset.i;
   var cellJ = +elCell.dataset.j;
   if (gBoard[cellI][cellJ].isShown) {
@@ -426,3 +437,51 @@ function showHint(cellI, cellJ) {
   numHints--;
   renderHint();
 }
+
+function renderSafeClicks() {
+  var elSafeClick = document.querySelector(`.safe-click`);
+  var strHTML = "Just for safety : ";
+  for (var i = 0; i < numSafeClicks; i++) {
+    strHTML += SAFE_CLICK;
+  }
+
+  if (numSafeClicks === 0) {
+    strHTML = `No safety jackets left!`;
+  }
+  elSafeClick.innerText = strHTML;
+}
+
+function safeClick() {
+  // debugger;
+  if (!gGame.isOn) return;
+  if (!numSafeClicks) return;
+  var safeCell;
+
+  while (!safeCell) {
+    var rndCell = getRandomCell(gBoard);
+    if (
+      !gBoard[rndCell.i][rndCell.j].isShown &&
+      !gBoard[rndCell.i][rndCell.j].isMine
+    ) {
+      safeCell = rndCell;
+    }
+  }
+
+  var elSafeCell = document.querySelector(
+    `[data-i="${safeCell.i}"][data-j="${safeCell.j}"]`
+  );
+  elSafeCell.classList.toggle(`selected-cell`);
+  setTimeout(
+    function (elCell) {
+      elCell.classList.toggle(`selected-cell`);
+    },
+    1500,
+    elSafeCell
+  );
+  numSafeClicks--;
+  renderSafeClicks();
+}
+
+// function setManualMines(elButton) {
+//   elButton.style.border=`dotted`;
+// }

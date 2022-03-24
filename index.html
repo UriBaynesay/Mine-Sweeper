@@ -9,27 +9,32 @@
   </head>
   <body onload="init()">
     <h2>Mine Sweeper</h2>
-    <h3>
-      <span class="ez-btn" onclick="setGameLevel(0)">EZ</span> |
-      <span class="mid-btn" onclick="setGameLevel(1)">medium</span> |
-      <span class="hard-btn" onclick="setGameLevel(2)">hard</span>
-    </h3>
 
-    <div class="hint" onclick="hintClicked()">
-      hint
+    <!-- <div class="manual">
+      <button class="button" onclick="setManualMines(this)">Select mines manually</button>
+    </div> -->
+
+    <div class="difficulty">
+      <h3>
+        <span class="ez-btn" onclick="setGameLevel(0)">EZ</span> |
+        <span class="mid-btn" onclick="setGameLevel(1)">medium</span> |
+        <span class="hard-btn" onclick="setGameLevel(2)">hard</span>
+      </h3>
     </div>
-    <div class="heart">
-    </div>
+
+    <div class="hint" onclick="hintClicked()">hint</div>
+    <div class="heart"></div>
 
     <table border="3" class="table">
       <tbody class="table-body"></tbody>
     </table>
 
+    <div class="safe-click" onclick="safeClick()"></div>
     <h4 class="timer"></h4>
     <h2 class="smiley" onclick="smileyClicked()"></h2>
 
     <div class="credit">
-      <footer >
+      <footer>
         <p>© Uri Baynesy 2022</p>
       </footer>
     </div>
