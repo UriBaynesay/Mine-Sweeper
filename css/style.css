@@ -1,0 +1,40 @@
+.cell {
+  height: 20px;
+  width: 20px;
+  border: outset;
+  border-color:silver ;
+}
+
+img {
+  height: 15px;
+  width: 15px;
+}
+
+.shown {
+  background-color: #8f8b8b;
+  border: inset;
+}
+
+.timer {
+  display: none;
+}
+
+/* .smiley {
+  
+} */
+
+body{
+    text-align: center;
+    background-color: #ecede0;
+    font-size: large;
+    font-family: monospace;
+}
+
+.table{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.shown.mine{
+  background-color: #ff000099;
+}
