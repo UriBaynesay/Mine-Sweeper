@@ -19,9 +19,9 @@ img {
   display: none;
 }
 
-/* .smiley {
-  
-} */
+.selectedHint{
+outline: auto;
+}
 
 body{
     text-align: center;

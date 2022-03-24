@@ -12,6 +12,7 @@ const GAME_STATUS = [
   { status: `lost`, icon: `🤯` },
 ];
 
+const HINT_ICON=`💡`;
 //model
 
 var gBoard;
@@ -21,8 +22,8 @@ var gStartTime;
 var isFirstClick;
 var currGameLevelIdx;
 var numLives;
-// var numHints;
-// var isHintClicked;
+var numHints;
+var isHintClicked;
 
 function init(sizeIdx = 0) {
   //setting the model
@@ -35,14 +36,14 @@ function init(sizeIdx = 0) {
   ("gBoard :");
   console.table(gBoard);
   numLives = 3;
-  // numHints = 3;
-  // isHintClicked = false;
+  numHints = 3;
+  isHintClicked = false;
 
   //setting the DOM
   renderBoard(gBoard, ".table-body");
   renderLives();
   renderSmiley();
-  // renderHint();
+  renderHint();
   var elTimer = document.querySelector(`.timer`);
   elTimer.style.display = `none`;
   clearInterval(gTimerInter);
@@ -118,19 +119,22 @@ function cellClicked(elCell) {
       renderTimer(".timer");
     }, 10);
   }
+
+  if (isHintClicked) {
+    checkHint(elCell);
+
+    return;
+  }
+
   var i = +elCell.dataset.i;
   var j = +elCell.dataset.j;
 
   var cell = gBoard[i][j];
 
-  // if(isHintClicked){
-  //   showCellsAround();
-  // }
-
   if (cell.isShown) {
     return;
   }
-  
+
   //update model
   if (isFirstClick) {
     cell.isShown = true;
@@ -342,7 +346,7 @@ function renderLives() {
   }
   var strHTML = "";
   for (var i = 0; i < numLives; i++) {
-    strHTML += `<img src=./img/heart.png></img>`;
+    strHTML += `<img src="img/heart.png"></img>`;
   }
   elHeart.innerHTML = strHTML;
 }
@@ -351,11 +355,74 @@ function smileyClicked() {
   init(currGameLevelIdx);
 }
 
-// function renderHint() {}
+function renderHint() {
+  var elHint=document.querySelector(`.hint`);
+  var strHTML='<p>';
+  for(var i=0;i<numHints;i++){
+    strHTML+=`<span class="hint${i}">${HINT_ICON}</span>`;
+  }
+  strHTML+=`</p>`
+  elHint.innerHTML=strHTML;
+}
 
-// function hintClicked() {
-//   if (!gGame.isOn) return;
-//   if (numHints) return;
-//   if (isFirstClick) return;
-//   isHintClicked = true;
-// }
+function hintClicked() {
+  // debugger
+  if (!gGame.isOn) return;
+  if (!numHints) return;
+  if (isFirstClick) return;
+  isHintClicked = true;
+  // debugger
+  var elHint=document.querySelector(`.hint${numHints-1}`);
+  elHint.classList.add(`selectedHint`);
+  
+}
+
+function checkHint(elCell) {
+
+  var cellI = +elCell.dataset.i;
+  var cellJ = +elCell.dataset.j;
+  if (gBoard[cellI][cellJ].isShown) {
+    console.log(`already shown`);
+    return;
+  }
+
+  showHint(cellI, cellJ);
+}
+
+function showHint(cellI, cellJ) {
+  // debugger
+  var cellsToShow = [];
+  for (var i = cellI - 1; i <= cellI + 1; i++) {
+    if (i < 0 || i >= gBoard.length) continue;
+    for (var j = cellJ - 1; j <= cellJ + 1; j++) {
+      if (j < 0 || j >= gBoard[0].length) continue;
+      if (gBoard[i][j].isShown) continue;
+
+      // update model
+      gBoard[i][j].isShown = true;
+      //update DOM
+      var elCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`);
+      renderCell(elCell);
+      cellsToShow.push({ i, j });
+    }
+  }
+  setTimeout(
+    function (cellsToHide) {
+      for (var i = 0; i < cellsToHide.length; i++) {
+        //update model
+        gBoard[cellsToHide[i].i][cellsToHide[i].j].isShown = false;
+        //update DOM
+        var elCell = document.querySelector(
+          `[data-i="${cellsToHide[i].i}"][data-j="${cellsToHide[i].j}"]`
+        );
+        renderCell(elCell);
+      }
+    },
+    1000,
+    cellsToShow
+  );
+
+  isHintClicked = false;
+  numHints--;
+  renderHint();
+}

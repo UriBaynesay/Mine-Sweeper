@@ -55,10 +55,10 @@ function renderCell(elCell) {
   var cellContent = "";
   if (gBoard[i][j].isShown) {
     cellContent = gBoard[i][j].isMine
-      ? `<img src=./img/1.png></img>`
+      ? `<img src="img/1.png"></img>`
       : gBoard[i][j].minesAroundCount;
   } else if (gBoard[i][j].isMarked) {
-    cellContent = `<img src=./img/flag.png></img>`;
+    cellContent = `<img src="img/flag.png"></img>`;
   }
   elCell.innerHTML = cellContent;
 }
